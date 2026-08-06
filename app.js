@@ -8,7 +8,7 @@
       Contoh: "https://script.google.com/macros/s/AKfy.../exec"
       Biarkan kosong ("") untuk mode uji coba tanpa database.
    ================================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbz0KqDszADY_RPUlWB6MAZcPsS7PAeiBwKAhmqqXem9wuCtfEyVzv0X2zPOUXuuc_n31g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzBKc1TzABQyXIjX5V99JApc8ZQx-d1NiwwxvpDR_xbn_4iaBRLpnh2_ShfVNseiTdiOA/exec";
 
 /* ---------------------------------------------------------------- */
 const $ = (id) => document.getElementById(id);
@@ -322,9 +322,11 @@ async function deleteEntry(id) {
   entries = entries.filter(e => e.id !== id);
   render();
   try {
-    await apiSend({ action: 'delete', id });
+    const res = await apiSend({ action: 'delete', id });
+    if (res && res.ok === false) throw new Error(res.error || 'Backend menolak permintaan');
     toast('Catatan dihapus');
   } catch (err) {
+    console.error('Gagal menghapus catatan:', err);
     toast('Gagal menghapus — coba lagi', true);
     load();
   }
@@ -365,6 +367,9 @@ $('entryForm').addEventListener('submit', async (ev) => {
 
   try {
     const res = await apiSend(payload);
+    if (res && res.ok === false) {
+      throw new Error(res.error || 'Backend menolak permintaan');
+    }
     if (res && res.foto) {
       entries = entries.map(e => e.id === payload.id ? { ...e, foto: res.foto } : e);
       render();
@@ -372,6 +377,7 @@ $('entryForm').addEventListener('submit', async (ev) => {
     toast(editing ? 'Perubahan tersimpan' : 'Catatan tersimpan');
     resetForm();
   } catch (err) {
+    console.error('Gagal menyimpan catatan:', err);
     toast('Gagal menyimpan — cek koneksi/URL', true);
     load();
   } finally {
