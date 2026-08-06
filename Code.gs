@@ -25,6 +25,20 @@ var FOLDER_NAME = 'Logbook Magang - Foto';
 var HEADERS = ['id', 'tanggal', 'hariKe', 'kegiatan', 'dipelajari',
                'kendala', 'output', 'rencana', 'foto', 'createdAt'];
 
+/**
+ * JALANKAN FUNGSI INI SEKALI SECARA MANUAL kalau muncul error
+ * "You do not have permission to call DriveApp...".
+ * Caranya: pilih "authorizeDriveAccess" di dropdown fungsi (toolbar atas
+ * editor ini), lalu klik tombol Run (▶). Google akan menampilkan layar
+ * izin — pilih akunmu, klik Advanced → Go to ... (unsafe) kalau muncul
+ * peringatan "belum diverifikasi", lalu Allow. Setelah itu upload foto
+ * dari web app akan berfungsi tanpa perlu deploy ulang.
+ */
+function authorizeDriveAccess() {
+  getPhotoFolder();
+  getSheet();
+}
+
 function getSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sh = ss.getSheetByName(SHEET_NAME);
