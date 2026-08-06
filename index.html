@@ -7,336 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
-<style>
-  /* ============================================================
-     KONFIGURASI — ganti URL di bawah setelah deploy Apps Script.
-     Cara lengkap ada di README.md
-     ============================================================ */
-
-  :root {
-    --paper:      #eaeef2;
-    --panel:      #ffffff;
-    --ink:        #16202c;
-    --ink-soft:   #4a5b6b;
-    --ink-faint:  #8296a6;
-    --line:       #d5dde4;
-    --line-soft:  #e5ebf0;
-    --teal:       #0d7a72;
-    --teal-deep:  #0a5f59;
-    --teal-wash:  #e4f2f0;
-    --amber:      #b8730f;
-    --amber-wash: #fbeed7;
-    --rose:       #b23b4e;
-    --rose-wash:  #f8e5e8;
-    --radius:     14px;
-    --radius-sm:  9px;
-    --shadow:     0 1px 2px rgba(22,32,44,.04), 0 8px 24px rgba(22,32,44,.06);
-    --shadow-lg:  0 2px 6px rgba(22,32,44,.06), 0 18px 44px rgba(22,32,44,.12);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-  }
-
-  /* subtle grid texture — the "engineering notebook" feel */
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(var(--line-soft) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: .5;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .wrap { position: relative; z-index: 1; max-width: 1160px; margin: 0 auto; padding: 0 20px 80px; }
-
-  /* ---------- Header ---------- */
-  header {
-    padding: 34px 0 24px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 20px;
-  }
-  .brand { display: flex; align-items: center; gap: 14px; }
-  .mark {
-    width: 46px; height: 46px; flex: none;
-    border-radius: 12px;
-    background: var(--teal);
-    display: grid; place-items: center;
-    box-shadow: 0 6px 16px rgba(13,122,114,.28);
-  }
-  .mark svg { width: 24px; height: 24px; }
-  .brand h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.55rem; font-weight: 700; letter-spacing: -.02em; line-height: 1.1;
-  }
-  .brand p { font-size: .82rem; color: var(--ink-soft); margin-top: 2px; }
-
-  .stats { display: flex; gap: 10px; }
-  .stat {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 9px 15px;
-    min-width: 86px;
-    box-shadow: var(--shadow);
-  }
-  .stat .num {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.35rem; font-weight: 600; color: var(--teal-deep); line-height: 1;
-  }
-  .stat .lbl {
-    font-size: .68rem; text-transform: uppercase; letter-spacing: .06em;
-    color: var(--ink-faint); margin-top: 5px; font-weight: 600;
-  }
-
-  /* ---------- Setup banner ---------- */
-  .setup {
-    background: var(--amber-wash);
-    border: 1px solid #edd29a;
-    border-radius: var(--radius);
-    padding: 16px 18px;
-    margin-bottom: 24px;
-    font-size: .88rem;
-    color: #7a4e08;
-    display: flex; gap: 12px; align-items: flex-start;
-  }
-  .setup svg { flex: none; width: 20px; height: 20px; margin-top: 1px; }
-  .setup code { font-family: 'JetBrains Mono', monospace; background: #fff5e0; padding: 1px 6px; border-radius: 5px; font-size: .82em; }
-
-  /* ---------- Layout ---------- */
-  .grid { display: grid; grid-template-columns: 380px 1fr; gap: 26px; align-items: start; }
-  @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
-
-  /* ---------- Form panel ---------- */
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-  .form-panel { position: sticky; top: 20px; }
-  @media (max-width: 880px) { .form-panel { position: static; } }
-
-  .panel-head {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line-soft);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .panel-head h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.02rem; font-weight: 600; letter-spacing: -.01em;
-  }
-  .mode-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: .68rem; font-weight: 600;
-    padding: 3px 9px; border-radius: 20px;
-    background: var(--teal-wash); color: var(--teal-deep);
-    text-transform: uppercase; letter-spacing: .05em;
-  }
-  .mode-tag.editing { background: var(--amber-wash); color: var(--amber); }
-
-  form { padding: 18px 20px 20px; }
-  .field { margin-bottom: 15px; }
-  .field:last-of-type { margin-bottom: 0; }
-  .field label {
-    display: block; font-size: .76rem; font-weight: 600;
-    color: var(--ink-soft); margin-bottom: 6px; letter-spacing: .01em;
-  }
-  .row2 { display: grid; grid-template-columns: 1fr 96px; gap: 12px; }
-
-  input, textarea {
-    width: 100%;
-    font-family: inherit; font-size: .9rem; color: var(--ink);
-    background: #fbfcfd;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 10px 12px;
-    transition: border-color .15s, box-shadow .15s, background .15s;
-    resize: vertical;
-  }
-  input[type="date"], .hari-input { font-family: 'JetBrains Mono', monospace; }
-  textarea { min-height: 62px; line-height: 1.5; }
-  input:focus, textarea:focus {
-    outline: none;
-    border-color: var(--teal);
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(13,122,114,.14);
-  }
-  input::placeholder, textarea::placeholder { color: var(--ink-faint); }
-
-  .actions { display: flex; gap: 10px; margin-top: 18px; }
-  button { font-family: inherit; cursor: pointer; border: none; }
-  .btn-primary {
-    flex: 1;
-    background: var(--teal); color: #fff;
-    font-weight: 600; font-size: .9rem;
-    padding: 11px; border-radius: var(--radius-sm);
-    transition: background .15s, transform .08s;
-    display: flex; align-items: center; justify-content: center; gap: 7px;
-  }
-  .btn-primary:hover { background: var(--teal-deep); }
-  .btn-primary:active { transform: translateY(1px); }
-  .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
-  .btn-ghost {
-    background: transparent; color: var(--ink-soft);
-    font-weight: 600; font-size: .88rem; padding: 11px 14px;
-    border-radius: var(--radius-sm); border: 1px solid var(--line);
-    transition: background .15s, color .15s;
-  }
-  .btn-ghost:hover { background: #f3f6f8; color: var(--ink); }
-
-  /* ---------- Feed side ---------- */
-  .feed-head {
-    display: flex; flex-wrap: wrap; gap: 12px;
-    align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .search-wrap { position: relative; flex: 1; min-width: 200px; }
-  .search-wrap svg {
-    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-    width: 16px; height: 16px; color: var(--ink-faint);
-  }
-  .search-wrap input { padding-left: 34px; background: var(--panel); }
-  .week-select {
-    font-family: 'JetBrains Mono', monospace; font-size: .82rem;
-    padding: 10px 12px; background: var(--panel);
-    border: 1px solid var(--line); border-radius: var(--radius-sm);
-    color: var(--ink); cursor: pointer;
-  }
-
-  /* ---------- Timeline ---------- */
-  .timeline { position: relative; padding-left: 4px; }
-  .week-group { margin-bottom: 8px; }
-  .week-label {
-    display: inline-flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: .72rem; font-weight: 600; letter-spacing: .04em;
-    color: var(--ink-faint); text-transform: uppercase;
-    margin: 22px 0 12px 30px;
-  }
-  .week-label::before {
-    content: ""; width: 22px; height: 1px; background: var(--line); margin-left: -30px;
-  }
-  .week-group:first-child .week-label { margin-top: 4px; }
-
-  .entry {
-    position: relative;
-    margin-left: 30px;
-    padding: 0 0 18px 26px;
-    border-left: 2px solid var(--line);
-  }
-  .entry:last-child { border-left-color: transparent; }
-  /* node on the spine */
-  .entry::before {
-    content: "";
-    position: absolute; left: -7px; top: 4px;
-    width: 12px; height: 12px; border-radius: 50%;
-    background: var(--panel); border: 2px solid var(--teal);
-    box-shadow: 0 0 0 3px var(--paper);
-  }
-
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    transition: box-shadow .2s, transform .2s;
-  }
-  .card:hover { box-shadow: var(--shadow-lg); }
-
-  .card-top {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 13px 16px; border-bottom: 1px solid var(--line-soft);
-    gap: 10px;
-  }
-  .card-date { display: flex; align-items: center; gap: 11px; min-width: 0; }
-  .hari-chip {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: .74rem; font-weight: 600;
-    background: var(--teal); color: #fff;
-    padding: 4px 9px; border-radius: 7px; white-space: nowrap;
-  }
-  .card-date .d {
-    font-size: .88rem; font-weight: 600; color: var(--ink);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .card-tools { display: flex; gap: 4px; flex: none; }
-  .icon-btn {
-    background: transparent; width: 30px; height: 30px;
-    border-radius: 7px; display: grid; place-items: center;
-    color: var(--ink-faint); transition: background .15s, color .15s;
-  }
-  .icon-btn svg { width: 16px; height: 16px; }
-  .icon-btn:hover { background: #f0f4f6; color: var(--ink); }
-  .icon-btn.del:hover { background: var(--rose-wash); color: var(--rose); }
-
-  .card-body { padding: 15px 16px 6px; }
-  .seg { margin-bottom: 12px; }
-  .seg-label {
-    font-size: .68rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: .06em; color: var(--teal-deep);
-    display: flex; align-items: center; gap: 6px; margin-bottom: 3px;
-  }
-  .seg.kendala .seg-label { color: var(--rose); }
-  .seg.rencana .seg-label { color: var(--amber); }
-  .seg-text { font-size: .89rem; color: var(--ink-soft); white-space: pre-wrap; word-break: break-word; }
-  .seg-text:empty::after { content: "—"; color: var(--ink-faint); }
-
-  /* ---------- Empty & loading ---------- */
-  .state {
-    text-align: center; padding: 60px 24px; color: var(--ink-faint);
-  }
-  .state svg { width: 44px; height: 44px; margin-bottom: 14px; opacity: .5; }
-  .state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; color: var(--ink-soft); margin-bottom: 6px; font-weight: 600; }
-  .state p { font-size: .88rem; max-width: 340px; margin: 0 auto; }
-  .spinner {
-    width: 30px; height: 30px; border-radius: 50%;
-    border: 3px solid var(--line); border-top-color: var(--teal);
-    animation: spin .8s linear infinite; margin: 0 auto 14px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ---------- Toast ---------- */
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: var(--ink); color: #fff;
-    font-size: .87rem; font-weight: 500;
-    padding: 12px 20px; border-radius: 10px;
-    box-shadow: 0 12px 32px rgba(0,0,0,.28);
-    opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
-    z-index: 100; display: flex; align-items: center; gap: 9px;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.err { background: var(--rose); }
-  .toast svg { width: 17px; height: 17px; }
-
-  @media (prefers-reduced-motion: reduce) {
-    * { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto; }
-  }
-
-  :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
-</style>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class="wrap">
 
-  <header>
+  <header id="siteHeader">
     <div class="brand">
       <div class="mark">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -350,15 +26,21 @@
       </div>
     </div>
     <div class="stats">
-      <div class="stat"><div class="num" id="statDays">0</div><div class="lbl">Hari tercatat</div></div>
-      <div class="stat"><div class="num" id="statWeeks">0</div><div class="lbl">Minggu</div></div>
+      <div class="stat days">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <div><div class="num" id="statDays">0</div><div class="lbl">Hari tercatat</div></div>
+      </div>
+      <div class="stat weeks">
+        <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
+        <div><div class="num" id="statWeeks">0</div><div class="lbl">Minggu</div></div>
+      </div>
     </div>
   </header>
 
   <div id="setupBanner" class="setup" style="display:none">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
     <div>
-      <strong>Belum terhubung ke database.</strong> Buka <code>index.html</code>, isi <code>API_URL</code> dengan link Web App dari Google Apps Script. Panduan lengkap ada di <code>README.md</code>. Untuk sekarang catatan hanya tersimpan sementara di browser ini.
+      <strong>Belum terhubung ke database.</strong> Buka <code>app.js</code>, isi <code>API_URL</code> dengan link Web App dari Google Apps Script. Panduan lengkap ada di <code>README.md</code>. Untuk sekarang catatan hanya tersimpan sementara di browser ini.
     </div>
   </div>
 
@@ -397,12 +79,24 @@
           <textarea id="kendala" placeholder="Masalah yang muncul dan cara mengatasinya"></textarea>
         </div>
         <div class="field">
-          <label for="output">Output / bukti</label>
-          <textarea id="output" placeholder="Nama file, link commit, screenshot, foto perangkat"></textarea>
+          <label for="output">Output / bukti (teks)</label>
+          <textarea id="output" placeholder="Link commit, nama alat, atau keterangan lain"></textarea>
         </div>
         <div class="field">
           <label for="rencana">Rencana besok</label>
           <textarea id="rencana" placeholder="Target untuk hari kerja berikutnya"></textarea>
+        </div>
+        <div class="field">
+          <label>Foto kegiatan / bukti</label>
+          <div class="photo-drop" id="photoDrop">
+            <input type="file" id="photoInput" accept="image/*" multiple hidden />
+            <button type="button" class="photo-pick-btn" id="photoPickBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Ambil / pilih foto
+            </button>
+            <p class="photo-hint" id="photoHint">Bisa lebih dari satu · otomatis dikompres &amp; diberi nama urut ke Drive</p>
+          </div>
+          <div class="photo-preview-grid" id="photoPreview"></div>
         </div>
         <div class="actions">
           <button type="submit" class="btn-primary" id="saveBtn">
@@ -431,276 +125,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-/* ================================================================
-   1) TEMPEL LINK WEB APP DI SINI setelah deploy Apps Script.
-      Contoh: "https://script.google.com/macros/s/AKfy.../exec"
-      Biarkan kosong ("") untuk mode uji coba tanpa database.
-   ================================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbz0KqDszADY_RPUlWB6MAZcPsS7PAeiBwKAhmqqXem9wuCtfEyVzv0X2zPOUXuuc_n31g/exec";
-
-/* ---------------------------------------------------------------- */
-const $ = (id) => document.getElementById(id);
-const HAS_DB = API_URL.trim().length > 0;
-let entries = [];
-
-const DAYS = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-
-function fmtDate(iso) {
-  if (!iso) return '';
-  const d = new Date(iso + 'T00:00:00');
-  if (isNaN(d)) return iso;
-  return `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-}
-// ISO week key like "2025-W32"
-function weekKey(iso) {
-  const d = new Date(iso + 'T00:00:00');
-  if (isNaN(d)) return 'lainnya';
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const day = t.getUTCDay() || 7;
-  t.setUTCDate(t.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
-  const wk = Math.ceil((((t - yearStart) / 86400000) + 1) / 7);
-  return `${t.getUTCFullYear()}-W${String(wk).padStart(2,'0')}`;
-}
-
-function toast(msg, isErr) {
-  const t = $('toast');
-  t.innerHTML = (isErr
-    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'
-    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>') + msg;
-  t.className = 'toast show' + (isErr ? ' err' : '');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.className = 'toast', 3000);
-}
-
-function esc(s) {
-  return (s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-}
-
-/* ---------------- Data layer ---------------- */
-const LS_KEY = 'logbook_local_v1';
-
-async function apiGet() {
-  if (!HAS_DB) {
-    return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-  }
-  const res = await fetch(API_URL);
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data.rows || []);
-}
-async function apiSend(payload) {
-  if (!HAS_DB) {
-    let list = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-    if (payload.action === 'create') list.push({ ...payload, id: payload.id });
-    else if (payload.action === 'update') list = list.map(e => e.id === payload.id ? { ...e, ...payload } : e);
-    else if (payload.action === 'delete') list = list.filter(e => e.id !== payload.id);
-    localStorage.setItem(LS_KEY, JSON.stringify(list));
-    return { ok: true };
-  }
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
-  });
-  return res.json();
-}
-
-/* ---------------- Render ---------------- */
-function render() {
-  const term = $('search').value.trim().toLowerCase();
-  const wk = $('weekFilter').value;
-
-  let list = [...entries].sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
-
-  // stats (from full set)
-  $('statDays').textContent = entries.length;
-  $('statWeeks').textContent = new Set(entries.map(e => weekKey(e.tanggal))).size;
-
-  // week filter options
-  const weeks = [...new Set(entries.map(e => weekKey(e.tanggal)))].sort().reverse();
-  const cur = $('weekFilter').value;
-  $('weekFilter').innerHTML = '<option value="">Semua minggu</option>' +
-    weeks.map((w, i) => `<option value="${w}"${w===cur?' selected':''}>Minggu ${weeks.length - i} (${w})</option>`).join('');
-
-  if (term) {
-    list = list.filter(e => [e.kegiatan, e.dipelajari, e.kendala, e.output, e.rencana]
-      .join(' ').toLowerCase().includes(term));
-  }
-  if (wk) list = list.filter(e => weekKey(e.tanggal) === wk);
-
-  const feed = $('feed');
-
-  if (list.length === 0) {
-    feed.innerHTML = entries.length === 0
-      ? `<div class="state">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-           <h3>Belum ada catatan</h3>
-           <p>Isi form di sebelah kiri untuk mencatat kegiatan hari pertamamu. Sedikit tiap hari, laporan menyusun dirinya sendiri.</p>
-         </div>`
-      : `<div class="state">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-           <h3>Tidak ada yang cocok</h3>
-           <p>Coba kata kunci lain atau pilih "Semua minggu".</p>
-         </div>`;
-    return;
-  }
-
-  // group by week
-  const groups = {};
-  list.forEach(e => { const k = weekKey(e.tanggal); (groups[k] = groups[k] || []).push(e); });
-  const orderedKeys = Object.keys(groups).sort().reverse();
-  const weekNumberOf = {}; weeks.forEach((w, i) => weekNumberOf[w] = weeks.length - i);
-
-  feed.innerHTML = orderedKeys.map(k => {
-    const rows = groups[k].map(e => cardHTML(e)).join('');
-    return `<div class="week-group">
-      <div class="week-label">Minggu ${weekNumberOf[k] || '?'} · ${k}</div>
-      ${rows}
-    </div>`;
-  }).join('');
-}
-
-function seg(cls, label, val) {
-  if (!val || !val.trim()) return '';
-  return `<div class="seg ${cls}"><div class="seg-label">${label}</div><div class="seg-text">${esc(val)}</div></div>`;
-}
-
-function cardHTML(e) {
-  return `<div class="entry"><div class="card">
-    <div class="card-top">
-      <div class="card-date">
-        ${e.hariKe ? `<span class="hari-chip">Hari ${esc(String(e.hariKe))}</span>` : ''}
-        <span class="d">${fmtDate(e.tanggal)}</span>
-      </div>
-      <div class="card-tools">
-        <button class="icon-btn" title="Edit" onclick="editEntry('${e.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-        </button>
-        <button class="icon-btn del" title="Hapus" onclick="deleteEntry('${e.id}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
-        </button>
-      </div>
-    </div>
-    <div class="card-body">
-      ${seg('kegiatan','Kegiatan', e.kegiatan)}
-      ${seg('dipelajari','Yang dipelajari', e.dipelajari)}
-      ${seg('kendala','Kendala &amp; solusi', e.kendala)}
-      ${seg('output','Output / bukti', e.output)}
-      ${seg('rencana','Rencana besok', e.rencana)}
-    </div>
-  </div></div>`;
-}
-
-/* ---------------- Form logic ---------------- */
-function resetForm() {
-  $('entryForm').reset();
-  $('editId').value = '';
-  $('formTitle').textContent = 'Catatan hari ini';
-  $('modeTag').textContent = 'Baru';
-  $('modeTag').className = 'mode-tag';
-  $('saveLabel').textContent = 'Simpan catatan';
-  $('cancelBtn').style.display = 'none';
-  $('tanggal').value = new Date().toISOString().slice(0, 10);
-  $('hariKe').value = entries.length + 1;
-}
-
-function editEntry(id) {
-  const e = entries.find(x => x.id === id);
-  if (!e) return;
-  $('editId').value = e.id;
-  $('tanggal').value = e.tanggal || '';
-  $('hariKe').value = e.hariKe || '';
-  $('kegiatan').value = e.kegiatan || '';
-  $('dipelajari').value = e.dipelajari || '';
-  $('kendala').value = e.kendala || '';
-  $('output').value = e.output || '';
-  $('rencana').value = e.rencana || '';
-  $('formTitle').textContent = 'Edit catatan';
-  $('modeTag').textContent = 'Edit';
-  $('modeTag').className = 'mode-tag editing';
-  $('saveLabel').textContent = 'Simpan perubahan';
-  $('cancelBtn').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-async function deleteEntry(id) {
-  if (!confirm('Hapus catatan ini? Tindakan tidak bisa dibatalkan.')) return;
-  entries = entries.filter(e => e.id !== id);
-  render();
-  try {
-    await apiSend({ action: 'delete', id });
-    toast('Catatan dihapus');
-  } catch (err) {
-    toast('Gagal menghapus — coba lagi', true);
-    load();
-  }
-}
-
-$('entryForm').addEventListener('submit', async (ev) => {
-  ev.preventDefault();
-  const btn = $('saveBtn');
-  const editing = !!$('editId').value;
-  const payload = {
-    action: editing ? 'update' : 'create',
-    id: editing ? $('editId').value : ('id' + Date.now() + Math.floor(Math.random()*1000)),
-    tanggal: $('tanggal').value,
-    hariKe: $('hariKe').value,
-    kegiatan: $('kegiatan').value,
-    dipelajari: $('dipelajari').value,
-    kendala: $('kendala').value,
-    output: $('output').value,
-    rencana: $('rencana').value
-  };
-
-  btn.disabled = true;
-  // optimistic update
-  if (editing) entries = entries.map(e => e.id === payload.id ? { ...e, ...payload } : e);
-  else entries.push(payload);
-  render();
-
-  try {
-    await apiSend(payload);
-    toast(editing ? 'Perubahan tersimpan' : 'Catatan tersimpan');
-    resetForm();
-  } catch (err) {
-    toast('Gagal menyimpan — cek koneksi/URL', true);
-    load();
-  } finally {
-    btn.disabled = false;
-  }
-});
-
-$('cancelBtn').addEventListener('click', resetForm);
-$('search').addEventListener('input', render);
-$('weekFilter').addEventListener('change', render);
-
-/* ---------------- Init ---------------- */
-async function load() {
-  try {
-    const data = await apiGet();
-    entries = data.map(e => ({
-      id: String(e.id || ''), tanggal: e.tanggal || '', hariKe: e.hariKe || '',
-      kegiatan: e.kegiatan || '', dipelajari: e.dipelajari || '',
-      kendala: e.kendala || '', output: e.output || '', rencana: e.rencana || ''
-    })).filter(e => e.id);
-    render();
-  } catch (err) {
-    $('feed').innerHTML = `<div class="state">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
-      <h3>Gagal memuat data</h3>
-      <p>Periksa apakah <code>API_URL</code> benar dan Web App sudah di-deploy dengan akses "Anyone".</p></div>`;
-  }
-}
-
-function boot() {
-  if (!HAS_DB) $('setupBanner').style.display = 'flex';
-  $('feed').innerHTML = `<div class="state"><div class="spinner"></div><p>Memuat catatan...</p></div>`;
-  resetForm();
-  load();
-}
-boot();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
