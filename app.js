@@ -8,7 +8,7 @@
       Contoh: "https://script.google.com/macros/s/AKfy.../exec"
       Biarkan kosong ("") untuk mode uji coba tanpa database.
    ================================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbzBKc1TzABQyXIjX5V99JApc8ZQx-d1NiwwxvpDR_xbn_4iaBRLpnh2_ShfVNseiTdiOA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx-qnlEgSFsupu2zwIZzCwUqlvq6vTWpNLd421yir4Jtu7tfR2FejSpyQklLyXNsG9Kew/exec";
 
 /* ---------------------------------------------------------------- */
 const $ = (id) => document.getElementById(id);
@@ -293,6 +293,7 @@ function resetForm() {
   keptPhotos = [];
   newPhotos = [];
   renderPhotoPreview();
+  REQUIRED_FIELDS.forEach(({ id }) => clearFieldError(id));
 }
 
 function editEntry(id) {
@@ -334,6 +335,15 @@ async function deleteEntry(id) {
 
 $('entryForm').addEventListener('submit', async (ev) => {
   ev.preventDefault();
+
+  const firstInvalid = validateForm();
+  if (firstInvalid) {
+    toast('Lengkapi dulu bagian yang wajib diisi', true);
+    firstInvalid.focus({ preventScroll: true });
+    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
   const btn = $('saveBtn');
   const label = $('saveLabel');
   const editing = !!$('editId').value;
@@ -374,7 +384,12 @@ $('entryForm').addEventListener('submit', async (ev) => {
       entries = entries.map(e => e.id === payload.id ? { ...e, foto: res.foto } : e);
       render();
     }
-    toast(editing ? 'Perubahan tersimpan' : 'Catatan tersimpan');
+    if (res && res.fotoError) {
+      console.error('Foto gagal diupload:', res.fotoError);
+      toast('Catatan tersimpan, tapi foto gagal diupload ke Drive', true);
+    } else {
+      toast(editing ? 'Perubahan tersimpan' : 'Catatan tersimpan');
+    }
     resetForm();
   } catch (err) {
     console.error('Gagal menyimpan catatan:', err);
@@ -384,6 +399,50 @@ $('entryForm').addEventListener('submit', async (ev) => {
     btn.disabled = false;
     label.textContent = originalLabel;
   }
+});
+
+/* ---------------- Validasi field wajib ---------------- */
+const REQUIRED_FIELDS = [
+  { id: 'tanggal', msg: 'Tanggal wajib diisi' },
+  { id: 'kegiatan', msg: 'Kegiatan hari ini wajib diisi' }
+];
+
+function setFieldError(id, msg) {
+  const el = $(id);
+  el.classList.add('input-invalid');
+  let err = el.nextElementSibling;
+  if (!err || !err.classList.contains('field-error')) {
+    err = document.createElement('div');
+    err.className = 'field-error';
+    el.insertAdjacentElement('afterend', err);
+  }
+  err.textContent = msg;
+}
+function clearFieldError(id) {
+  const el = $(id);
+  el.classList.remove('input-invalid');
+  const err = el.nextElementSibling;
+  if (err && err.classList.contains('field-error')) err.remove();
+}
+
+// Validasi seluruh field wajib; kembalikan elemen pertama yang masih kosong (atau null kalau lolos).
+function validateForm() {
+  let firstInvalid = null;
+  REQUIRED_FIELDS.forEach(({ id, msg }) => {
+    const el = $(id);
+    if (!el.value || !el.value.trim()) {
+      setFieldError(id, msg);
+      if (!firstInvalid) firstInvalid = el;
+    } else {
+      clearFieldError(id);
+    }
+  });
+  return firstInvalid;
+}
+
+// Hapus tanda error begitu pengguna mulai mengisi lagi.
+REQUIRED_FIELDS.forEach(({ id }) => {
+  $(id).addEventListener('input', () => clearFieldError(id));
 });
 
 $('cancelBtn').addEventListener('click', resetForm);

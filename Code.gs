@@ -153,35 +153,64 @@ function doPost(e) {
     var sh = getSheet();
 
     if (action === 'create') {
-      var uploaded = uploadPhotos(body.fotoBaru, body.tanggal);
-      var fotoAll = (body.fotoLama || []).concat(uploaded);
+      // Simpan teks catatan DULU — kalau upload foto gagal (mis. izin Drive
+      // belum di-otorisasi), catatan tidak boleh ikut hilang.
+      var fotoLama = body.fotoLama || [];
       sh.appendRow([
         body.id, body.tanggal, body.hariKe, body.kegiatan, body.dipelajari,
-        body.kendala, body.output, body.rencana, JSON.stringify(fotoAll), new Date()
+        body.kendala, body.output, body.rencana, JSON.stringify(fotoLama), new Date()
       ]);
-      return json({ ok: true, action: 'create', id: body.id, foto: fotoAll });
+      var rowIndex = sh.getLastRow();
+
+      var fotoAll = fotoLama;
+      var fotoError = null;
+      try {
+        var uploaded = uploadPhotos(body.fotoBaru, body.tanggal);
+        if (uploaded.length) {
+          fotoAll = fotoLama.concat(uploaded);
+          sh.getRange(rowIndex, 9).setValue(JSON.stringify(fotoAll));
+        }
+      } catch (photoErr) {
+        fotoError = String(photoErr);
+      }
+
+      return json({ ok: true, action: 'create', id: body.id, foto: fotoAll, fotoError: fotoError });
     }
 
     if (action === 'update' || action === 'delete') {
       var ids = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 0), 1).getValues();
-      var rowIndex = -1;
+      var rowIndex2 = -1;
       for (var i = 0; i < ids.length; i++) {
-        if (String(ids[i][0]) === String(body.id)) { rowIndex = i + 2; break; }
+        if (String(ids[i][0]) === String(body.id)) { rowIndex2 = i + 2; break; }
       }
-      if (rowIndex === -1) return json({ ok: false, error: 'id tidak ditemukan' });
+      if (rowIndex2 === -1) return json({ ok: false, error: 'id tidak ditemukan' });
 
       if (action === 'delete') {
-        sh.deleteRow(rowIndex);
+        sh.deleteRow(rowIndex2);
         return json({ ok: true, action: 'delete', id: body.id });
       }
-      // update
-      var uploadedU = uploadPhotos(body.fotoBaru, body.tanggal);
-      var fotoAllU = (body.fotoLama || []).concat(uploadedU);
-      sh.getRange(rowIndex, 1, 1, 9).setValues([[
+
+      // update teks DULU, foto belakangan (alasan sama seperti create)
+      var fotoLamaU = body.fotoLama || [];
+      sh.getRange(rowIndex2, 1, 1, 8).setValues([[
         body.id, body.tanggal, body.hariKe, body.kegiatan,
-        body.dipelajari, body.kendala, body.output, body.rencana, JSON.stringify(fotoAllU)
+        body.dipelajari, body.kendala, body.output, body.rencana
       ]]);
-      return json({ ok: true, action: 'update', id: body.id, foto: fotoAllU });
+      sh.getRange(rowIndex2, 9).setValue(JSON.stringify(fotoLamaU));
+
+      var fotoAllU = fotoLamaU;
+      var fotoErrorU = null;
+      try {
+        var uploadedU = uploadPhotos(body.fotoBaru, body.tanggal);
+        if (uploadedU.length) {
+          fotoAllU = fotoLamaU.concat(uploadedU);
+          sh.getRange(rowIndex2, 9).setValue(JSON.stringify(fotoAllU));
+        }
+      } catch (photoErrU) {
+        fotoErrorU = String(photoErrU);
+      }
+
+      return json({ ok: true, action: 'update', id: body.id, foto: fotoAllU, fotoError: fotoErrorU });
     }
 
     return json({ ok: false, error: 'action tidak dikenal' });

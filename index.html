@@ -52,13 +52,13 @@
         <h2 id="formTitle">Catatan hari ini</h2>
         <span class="mode-tag" id="modeTag">Baru</span>
       </div>
-      <form id="entryForm">
+      <form id="entryForm" novalidate>
         <input type="hidden" id="editId" />
         <div class="field">
           <div class="row2">
             <div>
-              <label for="tanggal">Tanggal</label>
-              <input type="date" id="tanggal" required />
+              <label for="tanggal">Tanggal <span class="req">*</span></label>
+              <input type="date" id="tanggal" />
             </div>
             <div>
               <label for="hariKe">Hari ke-</label>
@@ -67,8 +67,8 @@
           </div>
         </div>
         <div class="field">
-          <label for="kegiatan">Kegiatan hari ini</label>
-          <textarea id="kegiatan" placeholder="Contoh: Setup broker Mosquitto, uji publish/subscribe 1 topik — berhasil" required></textarea>
+          <label for="kegiatan">Kegiatan hari ini <span class="req">*</span></label>
+          <textarea id="kegiatan" placeholder="Contoh: Setup broker Mosquitto, uji publish/subscribe 1 topik — berhasil"></textarea>
         </div>
         <div class="field">
           <label for="dipelajari">Yang dipelajari</label>
