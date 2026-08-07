@@ -100,6 +100,8 @@ function nextSeq(dateStr) {
  * Upload sekumpulan foto (base64) ke Drive dengan nama otomatis
  * "YYYY-MM-DD_urutan.ext" — pengguna tidak perlu mengetik nama file.
  * Mengembalikan array {id, name, url, viewUrl} siap dipakai di web.
+ * Setiap foto diproses dalam try/catch tersendiri supaya satu foto yang
+ * bermasalah tidak menggagalkan foto lain yang sudah berhasil diupload.
  */
 function uploadPhotos(fotos, tanggal) {
   if (!fotos || !fotos.length) return [];
@@ -109,21 +111,34 @@ function uploadPhotos(fotos, tanggal) {
   var out = [];
   fotos.forEach(function (f) {
     if (!f || !f.base64) return;
-    var seq = nextSeq(dateStr);
-    var mimeType = f.mimeType || 'image/jpeg';
-    var ext = mimeType.indexOf('png') > -1 ? 'png' : 'jpg';
-    var name = dateStr + '_' + pad(seq, 3) + '.' + ext;
-    var bytes = Utilities.base64Decode(f.base64);
-    var blob = Utilities.newBlob(bytes, mimeType, name);
-    var file = folder.createFile(blob);
-    file.setSharingAccess(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    var id = file.getId();
-    out.push({
-      id: id,
-      name: name,
-      url: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000',
-      viewUrl: 'https://drive.google.com/file/d/' + id + '/view'
-    });
+    try {
+      var seq = nextSeq(dateStr);
+      var mimeType = f.mimeType || 'image/jpeg';
+      var ext = mimeType.indexOf('png') > -1 ? 'png' : 'jpg';
+      var name = dateStr + '_' + pad(seq, 3) + '.' + ext;
+      var bytes = Utilities.base64Decode(f.base64);
+      var blob = Utilities.newBlob(bytes, mimeType, name);
+      var file = folder.createFile(blob);
+
+      // Coba buat foto bisa diakses publik (perlu untuk ditampilkan di web).
+      // Kalau langkah ini gagal (mis. dibatasi kebijakan akun/organisasi),
+      // foto tetap tersimpan — jangan sampai batal semuanya gara-gara ini.
+      try {
+        file.setSharingAccess(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (shareErr) {
+        // diamkan — file tetap ada di Drive, hanya mungkin belum publik.
+      }
+
+      var id = file.getId();
+      out.push({
+        id: id,
+        name: name,
+        url: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000',
+        viewUrl: 'https://drive.google.com/file/d/' + id + '/view'
+      });
+    } catch (fileErr) {
+      // Lewati foto ini, lanjut ke foto berikutnya dalam batch yang sama.
+    }
   });
   return out;
 }
