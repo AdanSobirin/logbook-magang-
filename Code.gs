@@ -153,6 +153,22 @@ function safeParseFoto(val) {
   }
 }
 
+/**
+ * Google Sheets otomatis mengubah sel yang isinya terlihat seperti tanggal
+ * (mis. "2026-08-03") menjadi objek Date sungguhan. Kalau langsung dikirim
+ * lewat JSON, Date berubah jadi string ISO lengkap dengan jam
+ * ("2026-08-03T17:00:00.000Z") yang tidak dikenali oleh tampilan web.
+ * Fungsi ini mengembalikannya ke format "YYYY-MM-DD" memakai timezone
+ * spreadsheet, supaya konsisten berapa pun cara Sheets menyimpannya.
+ */
+function formatDateCell(val) {
+  if (Object.prototype.toString.call(val) === '[object Date]' && !isNaN(val)) {
+    var tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+    return Utilities.formatDate(val, tz, 'yyyy-MM-dd');
+  }
+  return val;
+}
+
 /** READ — kembalikan semua catatan sebagai array JSON */
 function doGet(e) {
   try {
@@ -163,7 +179,7 @@ function doGet(e) {
       var r = values[i];
       if (!r[0]) continue;
       rows.push({
-        id: String(r[0]), tanggal: r[1], hariKe: r[2], kegiatan: r[3],
+        id: String(r[0]), tanggal: formatDateCell(r[1]), hariKe: r[2], kegiatan: r[3],
         dipelajari: r[4], kendala: r[5], output: r[6], rencana: r[7],
         foto: safeParseFoto(r[8])
       });
