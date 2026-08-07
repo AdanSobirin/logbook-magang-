@@ -8,7 +8,7 @@
       Contoh: "https://script.google.com/macros/s/AKfy.../exec"
       Biarkan kosong ("") untuk mode uji coba tanpa database.
    ================================================================ */
-const API_URL = "https://script.google.com/macros/s/AKfycbzBKc1TzABQyXIjX5V99JApc8ZQx-d1NiwwxvpDR_xbn_4iaBRLpnh2_ShfVNseiTdiOA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx-qnlEgSFsupu2zwIZzCwUqlvq6vTWpNLd421yir4Jtu7tfR2FejSpyQklLyXNsG9Kew/exec";
 
 /* ---------------------------------------------------------------- */
 const $ = (id) => document.getElementById(id);
